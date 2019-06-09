@@ -1,9 +1,10 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
 import PropTypes from "prop-types";
-import {Header, Container, Segment, Grid} from "semantic-ui-react";
+import {Header, Container, Segment, Grid, Button} from "semantic-ui-react";
 import orderApi from "../../../api/order"
 import OrderWrapper from "../../OrderWrapper";
+import {Link} from "react-router-dom";
 
 class OrderHistory extends Component {
     static propTypes = {};
@@ -21,6 +22,15 @@ class OrderHistory extends Component {
         this.setState({orders});
     };
 
+    payForOrder = async (orderId, amount) => {
+        let {orders} = this.state;
+        const paidOrder = await orderApi.payForOrder(orderId, amount);
+
+        orders[orders.findIndex(order => order.id === paidOrder.id)] = paidOrder;
+
+        this.setState({orders})
+    };
+
     render() {
         const {orders} = this.state;
         return (
@@ -34,11 +44,22 @@ class OrderHistory extends Component {
                     const isConfirmed = status === "CONFIRMED";
 
                     return (
-                        <Segment inverted
-                                 color={isCanceled ? "red" : isConfirmed ? "yellow" : isPaid ? "blue" : isRealised ? "green" : ""}
-                                 key={`order: ${order.id}`}>
+                        <Segment
+                            color={isCanceled ? "red" : isConfirmed ? "yellow" : isPaid ? "blue" : isRealised ? "green" : ""}
+                            key={`order: ${order.id}`}>
                             <Header content={`Order status: ${status}`}/>
-                            <OrderWrapper order={order}/>
+                            <OrderWrapper order={order} eventDate={order.tickets[0].eventDate}
+                                          eventName={order.tickets[0].eventName} payForOrder={this.payForOrder}/>
+                            <Container text textAlign='center'>
+                                <Button.Group basic>
+                                    <Link to={`/order/cancel?orderId=${order.id}`}>
+                                        <Button>Cancel order</Button>
+                                    </Link>
+                                    <Link to={`/event/exact?eventId=${order.tickets[0].eventId}`}>
+                                        <Button>Event page</Button>
+                                    </Link>
+                                </Button.Group>
+                            </Container>
                         </Segment>)
                 })}
             </Container>

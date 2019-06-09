@@ -1,16 +1,33 @@
 import React, {Component} from "react";
 import PropTypes from 'prop-types';
-import {Button, Container, Grid, Header, Segment, Table} from "semantic-ui-react";
+import {Button, Container, Form, Grid, Header, Input, Segment, Table} from "semantic-ui-react";
 import moment from "moment";
-import {Link} from "react-router-dom";
+import InlineError from "./baseComponents/InlineError";
 
 class OrderWrapper extends Component {
     static propTypes = {};
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            paying: "",
+            error: null
+        }
+    }
+
+    onPayChange = (e, data) => this.setState({
+        [data.name]: data.value
+    });
+
+    payForOrder = async () => {
+        await this.props.payForOrder(this.props.order.id, this.state.paying);
+    };
+
     render() {
-        const {order} = this.props;
-        const {tickets, id, client, status, createdAt, totalPrice} = order;
-        const {eventName, eventDate, eventId} = tickets[0];
+        const {paying, error} = this.state;
+        const {order, eventName, eventDate} = this.props;
+        const {tickets, id, createdAt, totalPrice, status} = order;
 
         return (
             <Segment raised>
@@ -19,9 +36,9 @@ class OrderWrapper extends Component {
                         <Header as={"h1"}>Event: {eventName} | Date: {eventDate}</Header>
                     </Segment>
 
-                    <Segment vertical>
-                        <Header as={"h1"}>Order Date: {moment(createdAt).fromNow()}</Header>
-                    </Segment>
+                    {createdAt && <Segment vertical>
+                        <Header as={"h1"}>Order Date: {moment(createdAt).format("MMMM Do YYYY, h:mm:ss a")}</Header>
+                    </Segment>}
                 </Segment>
 
                 <Segment>
@@ -39,7 +56,8 @@ class OrderWrapper extends Component {
                         </Table.Header>
 
                         <Table.Body>
-                            {tickets.map(ticket => <Table.Row key={`order: ${id} ticket: ${ticket.id}`}>
+                            {tickets.map(ticket => <Table.Row
+                                key={`order: ${id} ticket: ${ticket.id} suname: ${ticket.attender.surname} documentNumber: ${ticket.attender.documentNumber}`}>
                                 <Table.Cell>{ticket.placeNumber}</Table.Cell>
                                 <Table.Cell>{ticket.type}</Table.Cell>
                                 <Table.Cell>{ticket.attender.name}</Table.Cell>
@@ -56,14 +74,14 @@ class OrderWrapper extends Component {
                     <Header as={"h1"}>Total price: {totalPrice}</Header>
                 </Segment>
 
-                <Button.Group basic>
-                    <Link to={`/order/cancel?orderId=${id}`}>
-                        <Button>Cancel order</Button>
-                    </Link>
-                    <Link to={`/event/exact?eventId=${eventId}`}>
-                        <Button>Event page</Button>
-                    </Link>
-                </Button.Group>
+                {status === "CONFIRMED" && <Container text><Form>
+                    <Header as='h5' content='Amount to pay *'/>
+                    {!!error && <InlineError text={error}/>}
+                    <Form.Input required error={!!error} id='paying' name='paying'
+                                value={paying}
+                                onChange={this.onPayChange}/>
+                    <Form.Button fluid content="Submit" primary onClick={this.payForOrder}/>
+                </Form></Container>}
             </Segment>
         )
     }
@@ -71,7 +89,10 @@ class OrderWrapper extends Component {
 
 
 OrderWrapper.propTypes = {
-    order: PropTypes.object.isRequired
+    order: PropTypes.object.isRequired,
+    payForOrder: PropTypes.func.isRequired,
+    eventName: PropTypes.string.isRequired,
+    eventDate: PropTypes.string.isRequired
 };
 
 
