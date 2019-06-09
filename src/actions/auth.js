@@ -1,6 +1,5 @@
 import {USER_LOGGED_IN, USER_LOGGED_OUT} from '../types/auth';
 import authApi from '../api/auth';
-import registerApi from "../api/register";
 import setAuthorizationHeader from "../utils/setAuthorizationHeader";
 
 export const userLoggedIn = ({accessToken, ...userData}) => ({
@@ -15,7 +14,7 @@ export const userLoggedOut = () => ({
 
 export const loginEmail = credentials => dispatch => authApi.loginEmail(credentials).then(data => login(data, dispatch));
 
-export const registerUser = userData => dispatch => registerApi.registerUser(userData).then(data => login(data, dispatch));
+export const registerUser = userData => dispatch => authApi.registerClient(userData).then(data => login(data, dispatch));
 
 
 export const login = (data, dispatch) => {
