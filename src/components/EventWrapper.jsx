@@ -39,18 +39,18 @@ class EventWrapper extends Component {
                             <Link to={`/order/add?eventId=${event.id}`}>
                                 <Button content={"Order"}/>
                             </Link>
-                            <Link to={`/event/exact?eventId=${event.id}`}>
-                                <Button content={"Event"}/>
-                            </Link>
-                            <Link to={`/event/delete?eventId=${event.id}`}>
-                                <Button content={"Delete"}/>
-                            </Link>
-                            <Link to={`/event/edit?eventId=${event.id}`}>
-                                <Button content={"Edit"}/>
-                            </Link>
-                            <Link to={`/event/artist?eventId=${event.id}`}>
-                                <Button content={"Edit Artists"}/>
-                            </Link>
+                            {/*<Link to={`/event/exact?eventId=${event.id}`}>*/}
+                            {/*    <Button content={"Event"}/>*/}
+                            {/*</Link>*/}
+                            {/*<Link to={`/event/delete?eventId=${event.id}`}>*/}
+                            {/*    <Button content={"Delete"}/>*/}
+                            {/*</Link>*/}
+                            {/*<Link to={`/event/edit?eventId=${event.id}`}>*/}
+                            {/*    <Button content={"Edit"}/>*/}
+                            {/*</Link>*/}
+                            {/*<Link to={`/event/artist?eventId=${event.id}`}>*/}
+                            {/*    <Button content={"Edit Artists"}/>*/}
+                            {/*</Link>*/}
                         </Button.Group>
                     </Grid.Column>
                 </Grid>

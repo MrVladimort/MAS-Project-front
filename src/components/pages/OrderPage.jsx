@@ -105,10 +105,14 @@ class OrderPage extends Component {
     };
 
     addAttender = async () => {
-        const {attenderFormData} = this.state;
-        const pickedAttenders = this.state.pickedAttenders;
-        pickedAttenders.push(await orderApi.createAttender(attenderFormData));
-        this.setState({pickedAttenders});
+        const {attenderFormData, pickedAttenders, attenders} = this.state;
+        const attender = await orderApi.createAttender(attenderFormData);
+        if (pickedAttenders.length < 10)
+            pickedAttenders.push(attender);
+        else
+            attenders.push(attender);
+
+        this.setState({pickedAttenders, attenders});
         this.addAttenderModalClose();
     };
 
@@ -116,10 +120,13 @@ class OrderPage extends Component {
         console.log(index);
 
         const {attenders, pickedAttenders} = this.state;
-        pickedAttenders.push(attenders[index]);
-        attenders.splice(index, 1);
 
-        this.setState({attenders, pickedAttenders});
+        if (pickedAttenders.length < 10) {
+            pickedAttenders.push(attenders[index]);
+            attenders.splice(index, 1);
+
+            this.setState({attenders, pickedAttenders});
+        }
     };
 
     unpickAttender = (index) => {
@@ -311,9 +318,10 @@ class OrderPage extends Component {
 
                     {event && attendersChosen &&
                     <div>
-                        <OrderWrapper order={orderData} eventDate={event.name} eventName={event.dateTime} payForOrder={this.payForOrder}/>
+                        <OrderWrapper order={orderData} eventDate={event.name} eventName={event.dateTime}
+                                      payForOrder={this.payForOrder}/>
                         {!orderConfirmed && <Button disabled={pickedAttenders.length === 0} fluid color='blue'
-                                onClick={this.confirmOrder}>Confirm order</Button>}
+                                                    onClick={this.confirmOrder}>Confirm order</Button>}
                     </div>}
                 </Container>
             </Container>
